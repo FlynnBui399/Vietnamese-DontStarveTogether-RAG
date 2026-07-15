@@ -1,6 +1,7 @@
 .PHONY: install format format-check lint typecheck test check dev run \
 	supabase-start supabase-stop supabase-migrate supabase-check \
-	wiki-check discover sync build-corpus sync-aliases embed-corpus evaluate-retrieval
+	wiki-check discover sync build-corpus sync-aliases embed-corpus evaluate-retrieval \
+	activate-corpus rollback-corpus export-corpus
 
 install:
 	uv sync
@@ -51,7 +52,7 @@ discover:
 	uv run python -m scripts.discover_pages
 
 sync:
-	uv run python -m scripts.sync_wiki
+	uv run python -m scripts.sync_wiki --sync-type incremental
 
 build-corpus:
 	uv run python -m scripts.build_corpus
@@ -64,3 +65,12 @@ embed-corpus:
 
 evaluate-retrieval:
 	uv run python -m scripts.evaluate_retrieval
+
+activate-corpus:
+	uv run python -m scripts.activate_corpus --version "$(CORPUS_VERSION)"
+
+rollback-corpus:
+	uv run python -m scripts.rollback_corpus --version "$(CORPUS_VERSION)"
+
+export-corpus:
+	uv run python -m scripts.export_corpus --version "$(CORPUS_VERSION)"

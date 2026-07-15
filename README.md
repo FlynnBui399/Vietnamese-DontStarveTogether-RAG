@@ -2,7 +2,7 @@
 
 An unofficial, source-grounded Vietnamese assistant for **Don't Starve Together**. The planned system uses FastAPI, Next.js, and Supabase PostgreSQL. Supabase is the production knowledge source; the browser communicates only with FastAPI.
 
-Milestones 0 through 8 provide the verified application foundation, private Supabase knowledge
+Milestones 0 through 9 provide the verified application foundation, private Supabase knowledge
 platform, revision-aware ingestion and processing, Vietnamese terminology, embeddings, hybrid
 retrieval, fail-closed grounded generation with validated citations, and a responsive chat UI. See
 `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified
@@ -73,6 +73,7 @@ uv run python -m scripts.sync_wiki --max-pages 30 --max-depth 1
 Add `--report data/cache/milestone2-sync.json` to either discovery or sync to retain the report in
 the disposable local cache. The sync report is always stored in `knowledge.sync_runs.details`.
 `make wiki-check`, `make discover`, and `make sync` wrap the default forms of these commands.
+`make sync` is the incremental form and records revision comparisons in `knowledge.sync_runs`.
 
 The client sends an identifying User-Agent, gzip support, `maxlag`, serial throttling, bounded retry,
 and caches only discovery/site-information requests. Latest revisions are fetched live in batches.
@@ -207,6 +208,49 @@ GET /api/sources/{chunk_id}
 `/api/sources/{chunk_id}` returns evidence only when its corpus is `active` or `archived`.
 `/api/entities/{slug}` requires evidence in the active corpus. All Supabase access remains in
 FastAPI with a backend secret/service-role credential; no Supabase key is present in the web code.
+
+## Incremental updates, activation, and snapshots
+
+The MVP uses the safe complete-regeneration strategy for incremental releases. `make sync` fetches
+only newly observed wiki revisions and marks older revisions inactive. A new corpus version is then
+rebuilt from every current immutable revision; unchanged pages are deterministically regenerated
+instead of copied into or edited inside the active version. This costs more processing than chunk
+reuse but keeps the update path small, auditable, and free of mixed-version state.
+
+Build, embed, and atomically activate a new version:
+
+```bash
+make sync
+uv run python -m scripts.build_corpus --version 2026-07-15.1
+uv run python -m scripts.embed_corpus --corpus-version 2026-07-15.1
+make activate-corpus CORPUS_VERSION=2026-07-15.1
+```
+
+Activation runs a protected PostgreSQL transaction. It requires `validating` state, passed
+processing and embedding manifests, exact page/chunk counts, complete current-revision coverage,
+complete provenance, and no missing embeddings. Only then does it archive the previous active
+version and activate the new one. A failed validation leaves the current active corpus untouched.
+
+Successful activation writes two private Storage objects and records their metadata in the corpus
+manifest:
+
+```text
+dst-corpus-snapshots/corpus/{version}/chunks.jsonl.gz
+dst-corpus-snapshots/corpus/{version}/manifest.json
+```
+
+The gzip JSONL contains the corpus, referenced wiki pages, attributions, aliases, chunks, and
+embeddings. The manifest records counts, byte size, SHA-256 checksum, compression, schema version,
+and creation time. Export an active/archived version again or atomically roll back:
+
+```bash
+make export-corpus CORPUS_VERSION=2026-07-15.1
+make rollback-corpus CORPUS_VERSION=2026-07-01.1
+```
+
+Rollback validates the archived version's internal completeness and embeddings before switching it
+back to `active`; it intentionally permits its immutable wiki revisions to be older than the latest
+synchronized revisions.
 
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 

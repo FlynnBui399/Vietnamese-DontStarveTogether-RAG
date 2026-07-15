@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     supabase_secret_key: SecretStr | None = None
     supabase_service_role_key: SecretStr | None = None
     supabase_raw_bucket: str = "dst-wiki-raw"
+    supabase_snapshot_bucket: str = "dst-corpus-snapshots"
+    supabase_eval_bucket: str = "dst-evaluation-reports"
 
     wiki_base_url: AnyHttpUrl = AnyHttpUrl("https://dontstarve.wiki.gg")
     wiki_api_url: AnyHttpUrl = AnyHttpUrl("https://dontstarve.wiki.gg/api.php")
