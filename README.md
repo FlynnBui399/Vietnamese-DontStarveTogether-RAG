@@ -2,7 +2,7 @@
 
 An unofficial, source-grounded Vietnamese assistant for **Don't Starve Together**. The planned system uses FastAPI, Next.js, and Supabase PostgreSQL. Supabase is the production knowledge source; the browser communicates only with FastAPI.
 
-Milestones 0 and 1 provide the verified application foundation plus the Supabase knowledge schema and private Storage buckets. Wiki ingestion, retrieval, and generation are implemented in subsequent milestones. See `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
+Milestones 0 through 2 provide the verified application foundation, private Supabase knowledge platform, and bounded revision-aware wiki ingestion. Corpus processing, retrieval, and generation are implemented in subsequent milestones. See `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
 
 ## Prerequisites
 
@@ -43,6 +43,39 @@ The following private buckets are created by migration:
 - `dst-wiki-raw`
 - `dst-corpus-snapshots`
 - `dst-evaluation-reports`
+
+## Wiki discovery and raw ingestion
+
+The version-controlled scope in `data/ingestion/discovery_config.json` starts from the main DST page
+and `Category:Don't Starve Together`. It permits only article namespace `0`, rejects known
+non-content namespaces and excluded title/category patterns, caps category depth and members, and
+deduplicates by MediaWiki page ID. Change this file deliberately instead of adding a full hard-coded
+page list.
+
+Verify the endpoint and inspect its namespaces/license, then preview the include/exclude report
+without writing to Supabase:
+
+```bash
+uv run python -m scripts.check_wiki
+uv run python -m scripts.discover_pages --max-pages 30 --max-depth 1
+```
+
+Run raw ingestion with a backend-only Supabase secret or legacy service-role key:
+
+```bash
+uv run python -m scripts.sync_wiki --max-pages 30 --max-depth 1
+```
+
+Add `--report data/cache/milestone2-sync.json` to either discovery or sync to retain the report in
+the disposable local cache. The sync report is always stored in `knowledge.sync_runs.details`.
+`make wiki-check`, `make discover`, and `make sync` wrap the default forms of these commands.
+
+The client sends an identifying User-Agent, gzip support, `maxlag`, serial throttling, bounded retry,
+and caches only discovery/site-information requests. Latest revisions are fetched live in batches.
+Raw objects use the deterministic private path `pages/{page_id}/{revision_id}.json`. A rerun checks
+the immutable `(mediawiki_page_id, revision_id)` pair and does not upload or upsert an unchanged
+revision. The current discovery policy assigns preliminary `dst` page scope from the explicitly DST
+seed/category; Milestone 3 performs content-level scope and entity classification.
 
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 
@@ -89,4 +122,4 @@ On systems with GNU Make, `make install`, `make check`, and `make supabase-check
 
 ## Security and attribution
 
-Use only development Supabase credentials locally. Raw corpus files, caches, keys, and generated builds are ignored. This is an unofficial project and is not affiliated with Klei Entertainment. Wiki-derived content must retain its canonical URL, revision, and applicable attribution in later milestones.
+Use only development Supabase credentials locally. Raw corpus files, caches, keys, and generated builds are ignored. This is an unofficial project and is not affiliated with Klei Entertainment. Raw ingestion preserves the site-reported license, canonical URL, revision, and attribution; later processing must carry them into every chunk and citation.

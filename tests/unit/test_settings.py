@@ -21,3 +21,9 @@ def test_secret_values_are_masked() -> None:
     )
 
     assert "development-secret-placeholder" not in repr(settings)
+
+
+def test_wiki_ingestion_is_serial_by_configuration() -> None:
+    """The bounded worker must not be configured to fan out wiki requests."""
+    with pytest.raises(ValidationError):
+        Settings.model_validate({"wiki_max_concurrency": 2})
