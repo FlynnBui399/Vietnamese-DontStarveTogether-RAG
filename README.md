@@ -136,6 +136,25 @@ exercise storage, dimensions, HNSW, FTS, retry, and query plumbing but are not a
 model. The database exposes backend-only lexical and semantic diagnostic RPCs, a GIN FTS index, and
 a cosine HNSW index. `make embed-corpus CORPUS_VERSION=<version>` wraps the worker.
 
+## Hybrid retrieval
+
+The backend retrieval service normalizes and expands the query, verifies that its query-embedding
+model matches the active corpus, and calls a backend-only PostgreSQL RPC. The RPC independently
+ranks FTS and cosine candidates, filters the single active corpus and exact `dst` scope, fuses ranks
+with RRF, and adds bounded resolved-entity and section-intent boosts. The backend then applies an
+auditable reranker, evidence threshold, body-hash deduplication, per-section limits, and an 1800-token
+context budget with stable `CTX-*` identifiers.
+
+Evaluate an active corpus against the version-controlled milestone set:
+
+```bash
+uv run python -m scripts.evaluate_retrieval
+```
+
+`make evaluate-retrieval` wraps the same command. Retrieval fails closed when no corpus is active or
+when its embedding model differs from the query adapter. Milestone 6 acceptance temporarily activates
+and restores a local test corpus; production activation and rollback remain Milestone 9 work.
+
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 
 ```powershell

@@ -11,3 +11,13 @@ Deerclops,Hươu một mắt,community_translation:boss mùa đông;common_missp
 Ancient Guardian,Hộ vệ cổ đại,community_translation:tê giác cổ đại;common_misspelling:ho ve co dai,boss,Ruins boss,true
 Pig Skin,Da heo,community_translation:da lợn;common_misspelling:da heo,item,Crafting material,true
 Science Machine,Máy khoa học,common_misspelling:may khoa hoc,structure,First science crafting station,true
+Amberosia,,common_misspelling:amberosa,food,Current corpus entity lookup,true
+Ancient Archive,,common_misspelling:ancent archive,structure,Current corpus entity lookup,true
+Ancient Beacon,,common_misspelling:ancent beacon,structure,Current corpus entity lookup,true
+Ancient Obelisk,,common_misspelling:ancent obelisk,structure,Current corpus entity lookup,true
+Astral Detector,,common_misspelling:astral detctor,tool,Current corpus entity lookup,true
+Bio Scanalyzer,,descriptive_alias:bio scanner,structure,Current corpus entity lookup,true
+Blue Moonlens,,common_misspelling:blue moon lens,item,Current corpus entity lookup,true
+Bone Helm,,descriptive_alias:bone helmet,armor,Current corpus entity lookup,true
+Crab King,,common_misspelling:crabking,boss,Current corpus entity lookup,true
+Directional Sign,,common_misspelling:direction sign,structure,Current corpus entity lookup,true

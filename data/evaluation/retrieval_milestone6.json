@@ -1,0 +1,27 @@
+{
+  "target_entity_recall_at_5": 0.9,
+  "target_natural_recall_at_10": 0.85,
+  "target_p95_retrieval_ms": 250.0,
+  "cases": [
+    {"id": "entity-01", "category": "entity", "query": "amberosa", "expected_titles": ["Amberosia"]},
+    {"id": "entity-02", "category": "entity", "query": "ancent archive", "expected_titles": ["Ancient Archive"]},
+    {"id": "entity-03", "category": "entity", "query": "ancent beacon", "expected_titles": ["Ancient Beacon"]},
+    {"id": "entity-04", "category": "entity", "query": "ancent obelisk", "expected_titles": ["Ancient Obelisk"]},
+    {"id": "entity-05", "category": "entity", "query": "astral detctor", "expected_titles": ["Astral Detector"]},
+    {"id": "entity-06", "category": "entity", "query": "bio scanner", "expected_titles": ["Bio Scanalyzer"]},
+    {"id": "entity-07", "category": "entity", "query": "blue moon lens", "expected_titles": ["Blue Moonlens"]},
+    {"id": "entity-08", "category": "entity", "query": "bone helmet", "expected_titles": ["Bone Helm"]},
+    {"id": "entity-09", "category": "entity", "query": "crabking", "expected_titles": ["Crab King"]},
+    {"id": "entity-10", "category": "entity", "query": "direction sign", "expected_titles": ["Directional Sign"]},
+    {"id": "natural-01", "category": "natural", "query": "What is Amberosia?", "expected_titles": ["Amberosia"]},
+    {"id": "natural-02", "category": "natural", "query": "Ancient Archive dùng để làm gì?", "expected_titles": ["Ancient Archive"]},
+    {"id": "natural-03", "category": "natural", "query": "Where can I find Ancient Beacon?", "expected_titles": ["Ancient Beacon"]},
+    {"id": "natural-04", "category": "natural", "query": "How does Ancient Obelisk work?", "expected_titles": ["Ancient Obelisk"]},
+    {"id": "natural-05", "category": "natural", "query": "Cách dùng Astral Detector?", "expected_titles": ["Astral Detector"]},
+    {"id": "natural-06", "category": "natural", "query": "What does Bio Scanalyzer scan?", "expected_titles": ["Bio Scanalyzer"]},
+    {"id": "natural-07", "category": "natural", "query": "Blue Moonlens dùng để làm gì?", "expected_titles": ["Blue Moonlens"]},
+    {"id": "natural-08", "category": "natural", "query": "Bone Helm armor protection", "expected_titles": ["Bone Helm"]},
+    {"id": "natural-09", "category": "natural", "query": "How to fight Crab King?", "expected_titles": ["Crab King"]},
+    {"id": "natural-10", "category": "natural", "query": "Directional Sign dùng thế nào?", "expected_titles": ["Directional Sign"]}
+  ]
+}

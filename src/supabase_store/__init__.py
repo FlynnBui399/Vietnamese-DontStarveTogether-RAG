@@ -7,6 +7,10 @@ from src.supabase_store.embedding_repository import (
 )
 from src.supabase_store.ingestion_repository import SupabaseIngestionRepository
 from src.supabase_store.processing_repository import SupabaseProcessingRepository
+from src.supabase_store.retrieval_repository import (
+    SupabaseRetrievalError,
+    SupabaseRetrievalRepository,
+)
 
 __all__ = [
     "SupabaseAliasError",
@@ -15,4 +19,6 @@ __all__ = [
     "SupabaseEmbeddingRepository",
     "SupabaseIngestionRepository",
     "SupabaseProcessingRepository",
+    "SupabaseRetrievalError",
+    "SupabaseRetrievalRepository",
 ]

@@ -2,60 +2,71 @@
 
 ## Current Milestone
 
-Milestone 5 - Embeddings and Search Indexes: **Complete**
+Milestone 6 - Hybrid Retrieval: **Complete**
 
-Next: Milestone 6 - Hybrid Retrieval.
+Next: Milestone 7 - Generation, Guardrails, and Citations. Work is paused for user verification.
 
-## Milestone 5 Completed
+## Milestone 6 Completed
 
-- Added a configurable embedding adapter contract and an Ollama `/api/embed` implementation using
-  explicit batch input and `truncate=false`.
-- Added manifest validation for provider, model, revision, dimensions, cosine distance,
-  normalization behavior, and batch size.
-- Added deterministic hash embeddings strictly for dependency-free unit/local acceptance testing.
-- Added resumable batch processing that embeds only missing chunks, validates every vector, records
-  per-chunk errors, and never advances a partial run beyond `building`.
-- Added backend-only model manifest creation, corpus/model binding, vector persistence, and protected
-  lexical/semantic diagnostic RPCs.
-- Added the 1024-dimensional cosine HNSW index; the existing generated FTS column and GIN index are
-  retained.
-- Added CLI/Make targets and an opt-in live acceptance test covering corpus rebuild, 100% vector
-  population, FTS search, vector search, and a zero-work resumable rerun.
+- Added a backend-only PostgreSQL hybrid RPC with a single-active-corpus CTE, exact `dst` scope
+  filtering, optional entity-type filtering, FTS and cosine candidate lists, and Reciprocal Rank
+  Fusion.
+- Added bounded resolved-entity and section-intent score boosts without combining incompatible raw
+  BM25 and cosine scales.
+- Added active-corpus/model-contract validation before query embedding and retrieval.
+- Added a transparent reranker using normalized RRF, title/content overlap, semantic similarity,
+  resolved entities, section intent, and a subjective-guide penalty.
+- Added an evidence threshold, exact body-hash duplicate removal, hard DST defense, and fixed final
+  result count.
+- Added diverse context assembly with preferred resolved pages, at most two chunks per page/section,
+  an 1800-token budget, and stable `CTX-*` identifiers.
+- Added a 20-case version-controlled entity/natural-query benchmark, local p95 measurement, CLI/Make
+  evaluation target, and opt-in live acceptance test.
+- Expanded the glossary with current-corpus canonical titles and reviewed typo/descriptive aliases
+  used by the entity benchmark.
 
 ## Verification
 
 Executed on 2026-07-15:
 
 ```text
-local corpus                                                100 / 100 chunks embedded
-embedding retry                                             passed (0 new vectors)
-vector dimensions / distance                                1024 / cosine
-semantic sample                                             correct page ranked first
-FTS sample                                                  correct page ranked first
-HNSW EXPLAIN                                                document_chunks_embedding_hnsw_idx
-FTS EXPLAIN                                                 document_chunks_fts_idx
-live tests/integration/test_milestone5_embeddings.py -q     passed (1 test)
-uv run ruff check .                                         passed
-uv run mypy                                                 passed (58 source files)
-uv run pytest -q                                            passed (28, 7 integration skipped)
-npx supabase db lint --local --schema knowledge             passed
-npx supabase migration list --local                         passed (4 migrations)
+Milestone 6 evaluation cases                                  20
+entity Recall@5                                             100% (target >= 90%)
+natural-query Recall@10                                     100% (target >= 85%)
+non-DST result count                                           0
+local Supabase retrieval p95                              13.633 ms (target <= 250 ms)
+sample typo: ancent archive                                  rank 1 / Ancient Archive
+active corpus/model enforcement                              passed
+context threshold/dedup/budget checks                        passed
+live tests/integration/test_milestone6_retrieval.py -q       passed (1 test)
+uv run ruff format --check .                                 passed
+uv run ruff check .                                          passed
+uv run mypy                                                  passed (69 source files)
+uv run pytest -q                                             passed (32, 8 integration skipped)
+npm run lint:web                                             passed
+npm run typecheck:web                                        passed
+npm run build:web                                            passed
+npx supabase db lint --local --schema knowledge              passed
+npx supabase migration list --local                          passed (5 migrations)
 ```
 
 ## Unverified Criteria
 
-- Ollama `bge-m3` was not downloaded or executed; the production adapter is contract-tested with a
-  mock response and local acceptance uses the explicitly marked deterministic provider.
-- Embedding and index acceptance was run against local Supabase, not the configured hosted project.
-- Semantic quality is measured in Milestone 6 rather than inferred from deterministic test vectors.
+- The 20-case benchmark is a milestone acceptance set over the current 30-page local corpus, not the
+  final 150+ question release benchmark required by Milestone 10.
+- Retrieval quality was validated with deterministic test vectors. Ollama `bge-m3` quality, a neural
+  cross-encoder reranker, and hosted-Supabase latency remain unverified.
+- The configured hosted project was not migrated or mutated; all database acceptance used explicit
+  local credentials.
 
 ## Known Issues and Deferred Work
 
-- A corpus-filtered nearest-neighbor query on the current 100-row corpus chooses the selective
-  corpus B-tree index plus sort; the HNSW plan is verified for the unfiltered nearest-neighbor shape.
-- Hybrid fusion, alias/entity boosts, reranking, evidence thresholds, context assembly, and retrieval
-  metrics are Milestone 6 work.
-- Corpus activation remains intentionally deferred to Milestone 9.
+- No corpus is left active after acceptance because production activation, rollback, and snapshots
+  belong to Milestone 9. Retrieval intentionally fails closed until an active corpus exists.
+- The heuristic reranker is auditable and benchmarked on the milestone set but is not equivalent to
+  a multilingual neural cross-encoder.
+- Generation, factual guardrails, and final citation validation begin in Milestone 7; `CTX-*` values
+  are retrieval context identifiers, not yet user-facing citations.
 - The user's `prompt.md` modification and `milestone0.md` deletion remain untouched.
 
 ## Completed Milestones
@@ -65,4 +76,5 @@ npx supabase migration list --local                         passed (4 migrations
 - Milestone 2 - Wiki Discovery and Raw Ingestion (`2f4ca03`)
 - Milestone 3 - Processing, Classification, and Chunking (`5ed2f75`)
 - Milestone 4 - Vietnamese Terminology and Alias Layer (`1b42ff1`)
-- Milestone 5 - Embeddings and Search Indexes
+- Milestone 5 - Embeddings and Search Indexes (`ece8130`)
+- Milestone 6 - Hybrid Retrieval

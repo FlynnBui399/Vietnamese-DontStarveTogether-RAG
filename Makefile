@@ -1,6 +1,6 @@
 .PHONY: install format format-check lint typecheck test check dev run \
 	supabase-start supabase-stop supabase-migrate supabase-check \
-	wiki-check discover sync build-corpus sync-aliases embed-corpus
+	wiki-check discover sync build-corpus sync-aliases embed-corpus evaluate-retrieval
 
 install:
 	uv sync
@@ -61,3 +61,6 @@ sync-aliases:
 
 embed-corpus:
 	uv run python -m scripts.embed_corpus --corpus-version "$(CORPUS_VERSION)"
+
+evaluate-retrieval:
+	uv run python -m scripts.evaluate_retrieval
