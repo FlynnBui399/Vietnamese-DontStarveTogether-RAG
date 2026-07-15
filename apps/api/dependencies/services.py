@@ -17,7 +17,11 @@ from src.embeddings import (
 )
 from src.generation import GroundedAnswerService, OllamaLLMAdapter
 from src.retrieval import ContextAssembler, RetrievalService
-from src.supabase_store import SupabaseAliasRepository, SupabaseRetrievalRepository
+from src.supabase_store import (
+    SupabaseAliasRepository,
+    SupabaseKnowledgeRepository,
+    SupabaseRetrievalRepository,
+)
 from src.terminology import AliasResolver, QueryExpander
 
 
@@ -112,3 +116,23 @@ def get_answer_service(
         llm.close()
         if isinstance(embedding_adapter, OllamaEmbeddingAdapter):
             embedding_adapter.close()
+
+
+def get_knowledge_repository(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> Iterator[SupabaseKnowledgeRepository]:
+    """Yield a backend-authenticated repository for public-safe knowledge reads."""
+    api_key = settings.supabase_admin_api_key
+    if settings.supabase_url is None or api_key is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Knowledge service is not configured.",
+        )
+    repository = SupabaseKnowledgeRepository(
+        base_url=str(settings.supabase_url),
+        api_key=api_key.get_secret_value(),
+    )
+    try:
+        yield repository
+    finally:
+        repository.close()

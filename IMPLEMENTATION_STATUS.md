@@ -2,38 +2,38 @@
 
 ## Current Milestone
 
-Milestone 7 - Generation, Guardrails, and Citations: **Complete**
+Milestone 8 - Web Interface: **Complete**
 
-Next: Milestone 8 - Web Interface.
+Next: Milestone 9 - Incremental Sync and Corpus Activation.
 
-## Milestone 7 Completed
+## Milestone 8 Completed
 
-- Added a provider-independent LLM boundary and an Ollama `/api/chat` adapter with bounded
-  temperature, timeout, non-streaming output, and response validation.
-- Added a Vietnamese context-only system prompt that treats retrieved documents as untrusted data,
-  rejects instructions inside sources, and forbids internal-knowledge or internet supplementation.
-- Converted accepted context blocks into stable `S1`, `S2`, ... source objects carrying chunk,
-  canonical URL, section, revision, corpus, source-kind, and subjectivity metadata.
-- Added fail-closed citation validation for unknown IDs, non-active-corpus chunks, uncited factual
-  claims, and numeric values absent from their cited evidence.
-- Added deterministic abstention for no evidence, incomplete comparison evidence, and any invalid
-  generated citation output.
-- Added structured conflict detection for differing field values on the same page and subjectivity
-  warnings for guide evidence.
-- Added the typed `POST /api/chat` contract with resolved aliases, confidence, abstention reason,
-  corpus version, citations, conflicts, subjectivity, and measured pipeline latencies.
-- Added sanitized service-unavailable responses without exposing provider details, stack traces, or
-  credentials.
+- Replaced the foundation page with a responsive Vietnamese chat interface and suggested prompts.
+- Added loading, empty-corpus, backend-error, abstention, and confidence states without leaving the
+  composer or conversation in a hanging state.
+- Added safe answer rendering through React text nodes, inline citation buttons, citation cards, and
+  a source drawer showing exact evidence, section, revision, corpus, source kind, original link, and
+  attribution.
+- Added resolved-alias display, subjective-guide warnings, source-conflict warnings, response
+  latency, corpus version, and public active-corpus status.
+- Added keyboard Escape handling for the drawer, explicit labels, ARIA live/status regions, visible
+  focus states, responsive layouts, and reduced-motion behavior.
+- Added backend-only public read endpoints for corpus status, alias autocomplete, active-corpus
+  entity detail, and active/archived source evidence.
+- Added source membership validation so building/validating/failed corpus chunks cannot be exposed
+  through `/api/sources/{chunk_id}`.
+- Kept the browser configuration limited to `NEXT_PUBLIC_API_BASE_URL`; no Supabase URL, key, or
+  internal table client is included in the frontend.
 
 ## Verification
 
 Executed on 2026-07-15:
 
 ```text
-uv run ruff format --check .                                 passed (83 files)
+uv run ruff format --check .                                 passed (87 files)
 uv run ruff check .                                          passed
-uv run mypy                                                  passed (83 source files)
-uv run pytest -q                                             passed (38, 8 integration skipped)
+uv run mypy                                                  passed (87 source files)
+uv run pytest -q                                             passed (42, 8 integration skipped)
 npm run lint:web                                             passed
 npm run typecheck:web                                        passed
 npm run build:web                                            passed
@@ -41,25 +41,23 @@ npx supabase db lint --local --schema knowledge              passed
 npx supabase migration list --local                          passed (5 migrations)
 ```
 
-Focused generation acceptance covers valid active-corpus citations, fake citation rejection,
-uncited-output abstention, no-evidence abstention, incomplete-comparison abstention, structured
-conflict detection, Ollama request shape, and the public structured chat response.
+Focused UI/API acceptance covers public corpus status, exact/fuzzy alias autocomplete ordering,
+entity deduplication, rejection of source evidence from a building corpus, and the public endpoint
+contract. The local Next.js page returned HTTP 200, contained the application title, and the API
+returned HTTP 200 for corpus status when launched with explicit local Supabase credentials.
 
 ## Unverified Criteria
 
-- Live answer quality and latency with Ollama remain unverified because no corpus is left active and
-  Milestone 9 owns validated production activation. Unit acceptance uses deterministic evidence and
-  mocked LLM output; it does not claim model quality.
-- Evidence-to-claim validation is deterministic and conservative: it proves citation membership,
-  active-corpus provenance, per-claim citation presence, and numerical support. General semantic
-  entailment remains an evaluation concern for Milestone 10.
-- Streaming is not enabled because the citation validator must inspect the complete answer before any
-  factual text is exposed. The UI may add streaming only if it preserves that fail-closed boundary.
+- A visual/interactive in-app browser pass was attempted, but no in-app browser instance was
+  available to the browser-control skill. Production build and localhost HTTP behavior passed; no
+  screenshot or manual visual-pass claim is made.
+- End-to-end successful chat rendering with real Ollama remains unverified because no corpus is left
+  active. Milestone 9 owns validated production activation.
+- Streaming remains disabled because the citation validator must inspect the complete answer before
+  factual text is exposed.
 
 ## Known Issues and Deferred Work
 
-- The web application still shows the foundation status page; the chat, citation cards, and source
-  drawer begin in Milestone 8.
 - No corpus is left active after acceptance. Atomic activation, rollback, and snapshots begin in
   Milestone 9.
 - The configured hosted project was not migrated or mutated; database verification used the local
@@ -75,4 +73,5 @@ conflict detection, Ollama request shape, and the public structured chat respons
 - Milestone 4 - Vietnamese Terminology and Alias Layer (`1b42ff1`)
 - Milestone 5 - Embeddings and Search Indexes (`ece8130`)
 - Milestone 6 - Hybrid Retrieval (`c6a0501`)
-- Milestone 7 - Generation, Guardrails, and Citations
+- Milestone 7 - Generation, Guardrails, and Citations (`6cc160b`)
+- Milestone 8 - Web Interface

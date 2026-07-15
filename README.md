@@ -2,10 +2,11 @@
 
 An unofficial, source-grounded Vietnamese assistant for **Don't Starve Together**. The planned system uses FastAPI, Next.js, and Supabase PostgreSQL. Supabase is the production knowledge source; the browser communicates only with FastAPI.
 
-Milestones 0 through 7 provide the verified application foundation, private Supabase knowledge
+Milestones 0 through 8 provide the verified application foundation, private Supabase knowledge
 platform, revision-aware ingestion and processing, Vietnamese terminology, embeddings, hybrid
-retrieval, and fail-closed grounded generation with validated citations. See `planning.md` for the
-authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
+retrieval, fail-closed grounded generation with validated citations, and a responsive chat UI. See
+`planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified
+progress.
 
 ## Prerequisites
 
@@ -184,6 +185,28 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/chat `
 The response includes `answer`, validated `citations`, `resolved_entities`, confidence, abstention
 state/reason, corpus version, subjective/conflict flags, and measured stage latencies. The endpoint
 returns a sanitized `503` when Supabase, embeddings, or Ollama are unavailable.
+
+## Web interface and public reads
+
+The Next.js home page is the chat application. It includes suggested Vietnamese prompts, loading and
+failure states, inline citation controls, citation cards, a keyboard-dismissable evidence drawer,
+resolved-alias explanations, confidence badges, guide/conflict warnings, corpus status, responsive
+layout, reduced-motion support, and visible focus states. Model output is rendered as escaped React
+text with separately constructed citation buttons; raw model HTML is never injected into the page.
+
+The browser calls FastAPI only through `NEXT_PUBLIC_API_BASE_URL`. These public-safe reads are also
+available for future UI extensions:
+
+```text
+GET /api/corpus/status
+GET /api/search?q=mu%20da%20heo
+GET /api/entities/{slug}
+GET /api/sources/{chunk_id}
+```
+
+`/api/sources/{chunk_id}` returns evidence only when its corpus is `active` or `archived`.
+`/api/entities/{slug}` requires evidence in the active corpus. All Supabase access remains in
+FastAPI with a backend secret/service-role credential; no Supabase key is present in the web code.
 
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 

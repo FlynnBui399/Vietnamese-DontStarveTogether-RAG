@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "DST Vietnamese Knowledge Assistant",
-  description: "Development status for the source-grounded Vietnamese DST assistant.",
+  title: "DST Assistant — Hỏi đáp tiếng Việt có nguồn",
+  description: "Trợ lý hỏi đáp tiếng Việt có dẫn nguồn về Don't Starve Together.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
@@ -15,4 +15,3 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     </html>
   );
 }
-
