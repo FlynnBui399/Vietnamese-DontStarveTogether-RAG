@@ -1,0 +1,34 @@
+{{Object Infobox
+|name=Football Helmet
+|image=Football Helmet.png
+|damage reduction=80%
+|durability=315
+}}
+{{Exclusivity|Don't Starve Together}}
+'''Football Helmet''' is a wearable [[Armor|armor]] item made from Pig Skin.
+
+== {{Pic|32|Science Machine}} Crafting ==
+It is crafted at a Science Machine and protects the wearer.
+
+{| class="wikitable"
+! Stat !! Value
+|-
+| Damage reduction || 80%
+|-
+| Durability || 315
+|}
+
+=== Tips ===
+Players may prefer it when Pig Skin is readily available.
+
+== Gallery ==
+<gallery>
+File:Football Helmet.png|Inventory icon
+</gallery>
+
+=== Alternate icons ===
+This presentation-only subsection must be skipped with its Gallery parent.
+
+[[Category:Armor]]
+[[Category:Items]]
+[[Category:Don't Starve Together]]

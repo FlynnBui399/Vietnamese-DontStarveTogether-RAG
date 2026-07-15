@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal, Self
 
-from pydantic import AnyHttpUrl, SecretStr, model_validator
+from pydantic import AnyHttpUrl, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     wiki_max_retries: int = 3
     wiki_cache_dir: Path = Path("data/cache/mediawiki")
     wiki_cache_ttl_seconds: int = 3600
+
+    embedding_dimensions: int = Field(default=1024, gt=0)
 
     @model_validator(mode="after")
     def validate_supabase_pair(self) -> Self:

@@ -2,7 +2,7 @@
 
 An unofficial, source-grounded Vietnamese assistant for **Don't Starve Together**. The planned system uses FastAPI, Next.js, and Supabase PostgreSQL. Supabase is the production knowledge source; the browser communicates only with FastAPI.
 
-Milestones 0 through 2 provide the verified application foundation, private Supabase knowledge platform, and bounded revision-aware wiki ingestion. Corpus processing, retrieval, and generation are implemented in subsequent milestones. See `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
+Milestones 0 through 3 provide the verified application foundation, private Supabase knowledge platform, bounded revision-aware wiki ingestion, and a validated section-aware corpus processor. Embeddings, retrieval, and generation are implemented in subsequent milestones. See `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
 
 ## Prerequisites
 
@@ -77,6 +77,31 @@ the immutable `(mediawiki_page_id, revision_id)` pair and does not upload or ups
 revision. The current discovery policy assigns preliminary `dst` page scope from the explicitly DST
 seed/category; Milestone 3 performs content-level scope and entity classification.
 
+## Corpus processing and chunking
+
+Build a new corpus from every active raw wiki revision with a backend-only Supabase credential:
+
+```bash
+uv run python -m scripts.build_corpus --version milestone3-local-v1
+```
+
+`make build-corpus` runs the same pipeline with an automatically timestamped version. The processor
+parses MediaWiki sections and infobox facts, normalizes wiki tables, removes navigation and
+boilerplate sections, classifies game scope and entity type with recorded evidence, and creates
+deterministic section-aware chunks. Each chunk carries its title, section path, canonical URL,
+revision, scope, entity type, source key, and normalization/search metadata.
+
+Validation rejects empty content, incomplete provenance, unexplained duplicates, uncovered source
+pages, and an empty corpus before any chunks are inserted. Exact duplicate bodies are filtered and
+recorded as explained validation issues. Structured table and infobox blocks stay atomic even when
+they exceed the normal 600-token chunk ceiling so a stat or recipe row is not split from its
+context.
+
+Milestone 3 deliberately leaves a successful corpus in `building` with a `pending-1024` embedding
+manifest. It does not create vectors or activate the corpus; Milestones 5 and 6 complete those
+steps. Rebuilding the same non-active version safely resets its chunks, while active and archived
+versions are protected from reset.
+
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 
 ```powershell
@@ -122,4 +147,4 @@ On systems with GNU Make, `make install`, `make check`, and `make supabase-check
 
 ## Security and attribution
 
-Use only development Supabase credentials locally. Raw corpus files, caches, keys, and generated builds are ignored. This is an unofficial project and is not affiliated with Klei Entertainment. Raw ingestion preserves the site-reported license, canonical URL, revision, and attribution; later processing must carry them into every chunk and citation.
+Use only development Supabase credentials locally. Raw corpus files, caches, keys, and generated builds are ignored. This is an unofficial project and is not affiliated with Klei Entertainment. Raw ingestion preserves the site-reported license, canonical URL, revision, and attribution; corpus processing carries source identity and revision provenance into every chunk for later citation construction.
