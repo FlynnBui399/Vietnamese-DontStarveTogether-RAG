@@ -37,7 +37,7 @@ class Settings(BaseSettings):
         "(https://github.com/FlynnBui399/Vietnamese-DontStarveTogether-RAG)"
     )
     wiki_request_delay_ms: int = 500
-    wiki_max_concurrency: Literal[1] = 1
+    wiki_max_concurrency: int = Field(default=1, ge=1, le=1)
     wiki_request_timeout_seconds: float = 20.0
     wiki_max_retries: int = 3
     wiki_cache_dir: Path = Path("data/cache/mediawiki")

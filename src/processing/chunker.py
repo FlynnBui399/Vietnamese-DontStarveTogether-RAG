@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import hashlib
 import re
-import unicodedata
 from dataclasses import dataclass
 
 from src.processing.classifier import PageClassifier
 from src.processing.models import ChunkDraft, PageClassification, ParsedPage
+from src.terminology.normalizer import normalize_search_text
 
 TOKEN_PATTERN = re.compile(r"\w+|[^\w\s]", re.UNICODE)
 SENTENCE_BOUNDARY = re.compile(r"(?<=[.!?])\s+")
@@ -204,8 +204,7 @@ class SectionChunker:
 
     @staticmethod
     def _normalize(value: str) -> str:
-        normalized = unicodedata.normalize("NFC", value).casefold()
-        return re.sub(r"\s+", " ", normalized).strip()
+        return normalize_search_text(value)
 
     @staticmethod
     def _sha256(value: str) -> str:

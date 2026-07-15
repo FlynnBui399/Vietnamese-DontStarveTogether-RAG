@@ -1,6 +1,6 @@
 .PHONY: install format format-check lint typecheck test check dev run \
 	supabase-start supabase-stop supabase-migrate supabase-check \
-	wiki-check discover sync build-corpus
+	wiki-check discover sync build-corpus sync-aliases
 
 install:
 	uv sync
@@ -55,3 +55,6 @@ sync:
 
 build-corpus:
 	uv run python -m scripts.build_corpus
+
+sync-aliases:
+	uv run python -m scripts.sync_aliases

@@ -102,6 +102,21 @@ manifest. It does not create vectors or activate the corpus; Milestones 5 and 6 
 steps. Rebuilding the same non-active version safely resets its chunks, while active and archived
 versions are protected from reset.
 
+## Vietnamese terminology and aliases
+
+`data/glossary/dst_vi_glossary.csv` is the reviewed terminology source of truth. Synchronize it
+with a backend-only credential:
+
+```bash
+uv run python -m scripts.sync_aliases
+```
+
+The normalizer retains the original query for later embeddings while producing Unicode NFC,
+lowercase, punctuation-normalized, and Vietnamese accent-insensitive variants. The resolver ranks
+canonical titles, verified translations, community aliases, abbreviations, common misspellings,
+and descriptive aliases before unverified generated candidates. Query expansion is bounded and
+uses only repository or stored aliases; it does not invent aliases with an LLM.
+
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 
 ```powershell

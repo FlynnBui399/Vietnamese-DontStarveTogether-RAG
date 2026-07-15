@@ -1,0 +1,13 @@
+english_term,vietnamese_term,aliases,term_type,notes,verified
+Football Helmet,Mũ bóng bầu dục,descriptive_alias:mũ da heo;common_misspelling:mu da heo;common_misspelling:mu bong bau duc,armor,Helmet crafted with Pig Skin,true
+Thermal Stone,Đá giữ nhiệt,community_translation:đá nhiệt;common_misspelling:da giu nhiet;common_misspelling:da nhiet,item,Portable temperature-management item,true
+Wendy,Wendy,descriptive_alias:nhân vật đi cùng ma;common_misspelling:nhan vat di cung ma,character,Character accompanied by Abigail,true
+Crock Pot,Nồi hầm,community_translation:nồi nấu chậm;common_misspelling:noi ham,structure,Cooking structure,true
+Alchemy Engine,Máy khoa học cấp hai,community_translation:máy luyện kim;common_misspelling:may khoa hoc cap hai,structure,Second science crafting station,true
+Spear,Giáo,community_translation:cây giáo;common_misspelling:giao,weapon,Basic melee weapon,true
+Ham Bat,Gậy giăm bông,community_translation:vũ khí thịt;common_misspelling:gay giam bong,weapon,Freshness-based meat weapon,true
+Beefalo,Bò Beefalo,community_translation:bò lông;common_misspelling:bo beefalo,mob,Neutral herd creature,true
+Deerclops,Hươu một mắt,community_translation:boss mùa đông;common_misspelling:huou mot mat,boss,Winter giant,true
+Ancient Guardian,Hộ vệ cổ đại,community_translation:tê giác cổ đại;common_misspelling:ho ve co dai,boss,Ruins boss,true
+Pig Skin,Da heo,community_translation:da lợn;common_misspelling:da heo,item,Crafting material,true
+Science Machine,Máy khoa học,common_misspelling:may khoa hoc,structure,First science crafting station,true

@@ -2,111 +2,61 @@
 
 ## Current Milestone
 
-Milestone 3 - Processing, Classification, and Chunking: **Complete**
+Milestone 4 - Vietnamese Terminology and Alias Layer: **Complete**
 
-Next: Milestone 4 - Vietnamese Normalization and Search Fields. Work is paused for user verification.
+Next: Milestone 5 - Embeddings and Search Indexes.
 
-## Milestone 3 Completed
+## Milestone 4 Completed
 
-- Added a MediaWiki-aware cleaner that preserves heading hierarchy, paragraphs, lists, infobox
-  facts, table field/value structure, and revision provenance while dropping navigation, gallery,
-  reference, skin, asset, and other boilerplate sections and their descendants.
-- Added evidence-recording page and section classification for `dst`, `dont_starve`, `mixed`, and
-  `unknown` scope plus the planned entity and source-kind labels.
-- Added deterministic page/section/subsection chunking with contextual headers, 450-token targets,
-  60-token overlap, atomic table/infobox/list blocks, normalized content, search text, and SHA-256
-  source/content keys.
-- Added corpus validation for required metadata, empty chunks, exact duplicates, source-page
-  coverage, and overall metadata completeness. Exact duplicate bodies are filtered only when the
-  duplicate is explicitly reported.
-- Added a backend-only corpus builder that reads immutable raw Storage objects, persists page
-  classifications, inserts only a fully validated chunk set, records a validation manifest, and
-  marks failed builds without inserting chunks.
-- Added a safe rebuild policy for non-active corpus versions and changed source-key uniqueness from
-  global to per-corpus so deterministic chunks can legitimately recur in later corpus versions.
-- Added `build-corpus` script/Make targets, focused fixtures and unit tests, and an opt-in live local
-  Supabase integration test.
-- Built and inspected `milestone3-local-v1` locally: 30 source pages, 30 covered pages, 102 candidate
-  chunks, 100 inserted chunks, two explained exact duplicates, zero empty chunks, zero missing
-  required metadata fields, and zero retained boilerplate-section headings.
-
-## Files Modified
-
-- `Makefile`
-- `pyproject.toml`
-- `uv.lock`
-- `src/config/settings.py`
-- `src/processing/`
-- `src/supabase_store/processing_repository.py`
-- `src/supabase_store/__init__.py`
-- `scripts/build_corpus.py`
-- `supabase/migrations/20260715020000_processing_corpus_constraints.sql`
-- `tests/fixtures/processing/`
-- `tests/unit/test_processing_cleaner.py`
-- `tests/unit/test_processing_classifier.py`
-- `tests/unit/test_processing_chunker.py`
-- `tests/unit/test_processing_validator.py`
-- `tests/unit/test_corpus_builder.py`
-- `tests/integration/test_milestone3_processing.py`
-- `README.md`
-- `IMPLEMENTATION_STATUS.md`
+- Added deterministic Unicode NFC, typography, whitespace, lowercase, and Vietnamese
+  accent-insensitive normalization while retaining the original query for embeddings.
+- Added a reviewed CSV glossary with 34 canonical, community, misspelling, and descriptive aliases
+  across 12 DST entities.
+- Added language hints for Vietnamese, English, and mixed queries without blindly translating
+  proper names.
+- Added exact-title, exact-alias, prefix/contained-entity, and fuzzy resolution with explicit alias
+  priority, confidence, verification, and source evidence.
+- Added bounded deterministic query expansion and guaranteed that unverified generated candidates
+  cannot outrank an otherwise equivalent verified alias.
+- Added backend-only, idempotent Supabase alias upserts and deterministic alias reads.
+- Updated new corpus chunks so `content_normalized` is truly accent-insensitive.
+- Fixed `WIKI_MAX_CONCURRENCY=1` environment parsing while retaining the required serial limit.
 
 ## Verification
 
 Executed on 2026-07-15:
 
 ```text
-uv run python -m scripts.build_corpus
-  --version milestone3-local-v1                              passed (30 pages, 100 chunks)
-same-version local corpus rebuild                           passed (safe and idempotent)
-live corpus/database inspection                             passed
-  source-page coverage                                      30 / 30
-  metadata completeness                                     100%
-  empty / duplicate inserted bodies                           0 / 0
-  explained candidate duplicates                              2
-  retained boilerplate headings                               0
-  corpus state / embedding state                            building / pending
-live tests/integration/test_milestone3_processing.py -q     passed (1 test)
-uv run ruff format --check .                                passed
+required resolution: mu da heo                              Football Helmet
+required resolution: da giu nhiet                           Thermal Stone
+required resolution: nhan vat di cung ma                    Wendy
+repository glossary                                         34 / 34 verified aliases
+live alias sync twice                                       passed (stable row count)
+live tests/integration/test_milestone4_aliases.py -q         passed (1 test)
+uv run ruff format --check .                                passed (50 files)
 uv run ruff check .                                         passed
-uv run mypy                                                 passed
-uv run pytest -q                                            passed (21, 5 integration skipped)
-npm run lint:web                                            passed
-npm run typecheck:web                                       passed
-npm run build:web                                           passed
-npx supabase db lint --local --schema knowledge             passed (no schema errors)
-npx supabase migration list --local                         passed (3 migrations applied)
-git diff --check                                            passed
-working-diff secret pattern scan                            passed (0 matches)
+uv run mypy                                                 passed (50 source files)
+uv run pytest -q                                            passed (25, 6 integration skipped)
 ```
-
-The five integration tests skip in the default suite because they require explicit local
-credentials and, for Milestone 2, live wiki access. The Milestone 3 test was also executed
-separately against the running local Supabase stack; it passed and created another valid corpus
-version with the same deterministic source keys.
 
 ## Unverified Criteria
 
-- Corpus processing was not executed against a hosted Supabase project; only the local stack was
-  used.
-- Hosted-project Storage quotas, key behavior, and network latency remain environment-specific.
-- Retrieval quality is not evaluated in Milestone 3 because embeddings and hybrid search are
-  introduced in Milestones 5 and 6.
+- Alias synchronization was verified against local Supabase, not the configured hosted project.
+- The glossary is deliberately small for the milestone and requires continued human review as the
+  corpus expands.
 
 ## Known Issues and Deferred Work
 
-- One structured block is approximately 721 tokens, above the normal 600-token ceiling. It remains
-  atomic intentionally because splitting table/infobox facts would violate the chunking rule.
-- The `pending-1024` embedding manifest is an explicit placeholder, not a model choice. Milestone 5
-  must replace it before vectors are written.
-- Accent-insensitive Vietnamese normalization, query expansion, embeddings, retrieval, and corpus
-  activation are intentionally deferred to Milestones 4 through 6 and 9.
-- The user's PowerShell profile contains an unrelated parse error and prints noise before command
-  output. Repository commands still execute successfully.
+- Embeddings, vector indexes, hybrid retrieval, reranking, and retrieval evaluation begin in
+  Milestones 5 and 6.
+- The user's `.env` currently targets a hosted Supabase endpoint while database acceptance tests use
+  explicit local credentials.
+- The user's `prompt.md` modification and `milestone0.md` deletion remain untouched.
 
 ## Completed Milestones
 
 - Milestone 0 - Repository and Supabase Foundation (`7c99299`)
 - Milestone 1 - Database, Extensions, and Storage (`10613e1`)
 - Milestone 2 - Wiki Discovery and Raw Ingestion (`2f4ca03`)
-- Milestone 3 - Processing, Classification, and Chunking
+- Milestone 3 - Processing, Classification, and Chunking (`5ed2f75`)
+- Milestone 4 - Vietnamese Terminology and Alias Layer
