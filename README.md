@@ -117,6 +117,25 @@ canonical titles, verified translations, community aliases, abbreviations, commo
 and descriptive aliases before unverified generated candidates. Query expansion is bounded and
 uses only repository or stored aliases; it does not invent aliases with an LLM.
 
+## Embeddings and search indexes
+
+Embed one non-active corpus with the configured Ollama model:
+
+```bash
+uv run python -m scripts.embed_corpus --corpus-version milestone5-local-v1
+```
+
+The default contract is Ollama `bge-m3`, 1024 dimensions, cosine distance, normalized vectors, and
+16-item batches. The worker validates batch cardinality, dimensions, finite values, and unit length;
+records provider/database failures on every affected chunk; resumes only chunks still missing a
+vector; and advances a fully embedded corpus to `validating`, never `active`. It sends
+`truncate=false` so overlong content fails visibly instead of silently changing evidence.
+
+For dependency-free local acceptance only, pass `--provider deterministic`. These hash vectors
+exercise storage, dimensions, HNSW, FTS, retry, and query plumbing but are not a production semantic
+model. The database exposes backend-only lexical and semantic diagnostic RPCs, a GIN FTS index, and
+a cosine HNSW index. `make embed-corpus CORPUS_VERSION=<version>` wraps the worker.
+
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 
 ```powershell

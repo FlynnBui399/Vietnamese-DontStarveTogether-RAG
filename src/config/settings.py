@@ -44,6 +44,12 @@ class Settings(BaseSettings):
     wiki_cache_ttl_seconds: int = 3600
 
     embedding_dimensions: int = Field(default=1024, gt=0)
+    embedding_provider: Literal["ollama", "deterministic"] = "ollama"
+    embedding_base_url: AnyHttpUrl = AnyHttpUrl("http://127.0.0.1:11434")
+    embedding_model: str = "bge-m3"
+    embedding_model_revision: str = "unversioned"
+    embedding_batch_size: int = Field(default=16, gt=0, le=128)
+    embedding_timeout_seconds: float = Field(default=120.0, gt=0)
 
     @model_validator(mode="after")
     def validate_supabase_pair(self) -> Self:
