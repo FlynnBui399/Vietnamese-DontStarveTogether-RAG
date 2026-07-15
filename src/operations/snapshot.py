@@ -23,6 +23,7 @@ class SnapshotRecords:
     """Complete relational records required for an application-level restore."""
 
     corpus: dict[str, Any]
+    embedding_model: dict[str, Any]
     pages: tuple[dict[str, Any], ...]
     attributions: tuple[dict[str, Any], ...]
     aliases: tuple[dict[str, Any], ...]
@@ -78,6 +79,7 @@ class CorpusSnapshotService:
         """Export active/archived corpus data including vectors needed for restore."""
         records = self.repository.load_snapshot_records(version)
         rows: list[dict[str, object]] = [{"record_type": "corpus", "data": records.corpus}]
+        rows.append({"record_type": "embedding_model", "data": records.embedding_model})
         rows.extend({"record_type": "wiki_page", "data": row} for row in records.pages)
         rows.extend(
             {"record_type": "source_attribution", "data": row} for row in records.attributions
@@ -103,6 +105,7 @@ class CorpusSnapshotService:
             "byte_count": len(compressed),
             "includes_embeddings": True,
             "record_counts": {
+                "embedding_models": 1,
                 "wiki_pages": len(records.pages),
                 "source_attributions": len(records.attributions),
                 "entity_aliases": len(records.aliases),
@@ -176,6 +179,16 @@ class SupabaseSnapshotRepository:
             raise SnapshotError("Snapshot source must be an active or archived corpus")
         corpus = corpus_rows[0]
         corpus_id = str(corpus["id"])
+        model_rows = self._get_rows(
+            "embedding_models",
+            {
+                "model_key": f"eq.{corpus['embedding_model_key']}",
+                "select": "*",
+                "limit": "1",
+            },
+        )
+        if not model_rows:
+            raise SnapshotError("Snapshot corpus has no embedding model contract")
         chunk_fields = (
             "id,wiki_page_id,source_key,page_title,section_path,chunk_index,content,"
             "content_normalized,content_hash,token_count,game_scope,entity_type,source_kind,"
@@ -191,6 +204,7 @@ class SupabaseSnapshotRepository:
         aliases = self._get_all("entity_aliases", {"select": "*", "order": "id.asc"})
         return SnapshotRecords(
             corpus=corpus,
+            embedding_model=model_rows[0],
             pages=tuple(pages),
             attributions=tuple(attributions),
             aliases=tuple(aliases),

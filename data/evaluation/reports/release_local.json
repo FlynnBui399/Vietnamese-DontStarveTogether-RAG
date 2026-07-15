@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "dataset_case_count": 150,
+  "benchmark_case_count": 20,
+  "recall_at_1": 1.0,
+  "recall_at_5": 1.0,
+  "recall_at_10": 1.0,
+  "mrr": 1.0,
+  "ndcg_at_10": 0.9807,
+  "entity_resolution_accuracy": 1.0,
+  "dst_scope_accuracy": 1.0,
+  "latency_p50_ms": 14.832,
+  "latency_p95_ms": 19.035
+}

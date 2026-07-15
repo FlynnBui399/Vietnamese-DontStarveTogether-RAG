@@ -1,7 +1,8 @@
 .PHONY: install format format-check lint typecheck test check dev run \
 	supabase-start supabase-stop supabase-migrate supabase-check \
 	wiki-check discover sync build-corpus sync-aliases embed-corpus evaluate-retrieval \
-	activate-corpus rollback-corpus export-corpus
+	activate-corpus rollback-corpus export-corpus restore-corpus release-corpus evaluate \
+	evaluate-answers
 
 install:
 	uv sync
@@ -66,6 +67,12 @@ embed-corpus:
 evaluate-retrieval:
 	uv run python -m scripts.evaluate_retrieval
 
+evaluate:
+	uv run python -m scripts.evaluate_release
+
+evaluate-answers:
+	uv run python -m scripts.evaluate_answers --observations "$(OBSERVATIONS)"
+
 activate-corpus:
 	uv run python -m scripts.activate_corpus --version "$(CORPUS_VERSION)"
 
@@ -74,3 +81,10 @@ rollback-corpus:
 
 export-corpus:
 	uv run python -m scripts.export_corpus --version "$(CORPUS_VERSION)"
+
+restore-corpus:
+	uv run python -m scripts.restore_corpus --source-version "$(SOURCE_VERSION)" \
+		--target-version "$(TARGET_VERSION)"
+
+release-corpus:
+	uv run python -m scripts.release_corpus --version "$(CORPUS_VERSION)"

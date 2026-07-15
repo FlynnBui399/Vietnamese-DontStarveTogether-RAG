@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     retrieval_match_count: int = Field(default=8, ge=1, le=20)
     min_evidence_score: float = Field(default=0.20, ge=0.0, le=1.0)
     max_context_tokens: int = Field(default=1800, ge=200, le=8000)
+    chat_rate_limit_per_minute: int = Field(default=30, ge=1, le=1000)
 
     @model_validator(mode="after")
     def validate_supabase_pair(self) -> Self:

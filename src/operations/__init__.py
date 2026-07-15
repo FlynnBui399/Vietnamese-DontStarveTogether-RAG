@@ -5,6 +5,11 @@ from src.operations.corpus_lifecycle import (
     CorpusTransition,
     SupabaseCorpusLifecycleRepository,
 )
+from src.operations.evaluation_report import (
+    EvaluationReportError,
+    SupabaseEvaluationReportRepository,
+)
+from src.operations.restore import CorpusRestoreService, RestoreReport, SupabaseRestoreRepository
 from src.operations.snapshot import (
     CorpusSnapshotService,
     SnapshotError,
@@ -16,10 +21,15 @@ from src.operations.snapshot import (
 __all__ = [
     "CorpusLifecycleError",
     "CorpusSnapshotService",
+    "CorpusRestoreService",
     "CorpusTransition",
+    "EvaluationReportError",
     "SnapshotError",
     "SnapshotRecords",
     "SnapshotReport",
     "SupabaseCorpusLifecycleRepository",
+    "SupabaseEvaluationReportRepository",
     "SupabaseSnapshotRepository",
+    "SupabaseRestoreRepository",
+    "RestoreReport",
 ]

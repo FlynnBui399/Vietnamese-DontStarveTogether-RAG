@@ -52,7 +52,8 @@ insert into knowledge.wiki_pages (
     game_scope,
     entity_type,
     source_kind,
-    metadata
+    metadata,
+    is_active
 )
 values (
     '00000000-0000-0000-0000-000000000003',
@@ -66,7 +67,8 @@ values (
     'dst',
     'other',
     'factual_article',
-    '{"fixture": true}'::jsonb
+    '{"fixture": true}'::jsonb,
+    false
 )
 on conflict (mediawiki_page_id, revision_id) do nothing;
 

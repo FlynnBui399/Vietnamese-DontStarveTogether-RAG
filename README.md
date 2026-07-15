@@ -2,9 +2,10 @@
 
 An unofficial, source-grounded Vietnamese assistant for **Don't Starve Together**. The planned system uses FastAPI, Next.js, and Supabase PostgreSQL. Supabase is the production knowledge source; the browser communicates only with FastAPI.
 
-Milestones 0 through 9 provide the verified application foundation, private Supabase knowledge
+Milestones 0 through 10 provide the verified application foundation, private Supabase knowledge
 platform, revision-aware ingestion and processing, Vietnamese terminology, embeddings, hybrid
-retrieval, fail-closed grounded generation with validated citations, and a responsive chat UI. See
+retrieval, fail-closed grounded generation with validated citations, a responsive chat UI, atomic
+corpus releases, evaluation gates, security controls, and checksum-verified recovery. See
 `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified
 progress.
 
@@ -158,7 +159,7 @@ uv run python -m scripts.evaluate_retrieval
 
 `make evaluate-retrieval` wraps the same command. Retrieval fails closed when no corpus is active or
 when its embedding model differs from the query adapter. Milestone 6 acceptance temporarily activates
-and restores a local test corpus; production activation and rollback remain Milestone 9 work.
+and restores a local test corpus; normal releases use the protected lifecycle commands below.
 
 ## Grounded generation and citations
 
@@ -252,6 +253,42 @@ Rollback validates the archived version's internal completeness and embeddings b
 back to `active`; it intentionally permits its immutable wiki revisions to be older than the latest
 synchronized revisions.
 
+## Evaluation, recovery, and release
+
+`data/evaluation/release_questions.json` contains 150 version-controlled questions across entity,
+crafting/acquisition, mechanic, character, comparison, strategy, typo/non-accented, and
+out-of-scope categories. Run the executable retrieval subset against the active corpus and optionally
+store the report in private Storage:
+
+```bash
+uv run python -m scripts.evaluate_release --output data/evaluation/reports/release.json --upload
+```
+
+The report always states both the 150-question dataset size and the number actually executed. Saved
+chat responses can be evaluated separately for citation structure and completeness, deterministic
+evidence traceability, numerical support, relevance, abstention, and subjectivity labeling:
+
+```bash
+make evaluate-answers OBSERVATIONS=data/evaluation/answer_observations.json
+```
+
+The observation file uses schema version `1`; each row records a release `case_id`, answer,
+citations with `id`/`page_title`/`content`, resolved entity titles, `abstained`, and
+`subjective_warning`. No response is generated or counted implicitly.
+
+Run an ordered incremental release, restore a private snapshot into a non-active validation version,
+and execute the deterministic security review with:
+
+```bash
+make release-corpus CORPUS_VERSION=2026-07-15.1
+make restore-corpus SOURCE_VERSION=2026-07-15.1 TARGET_VERSION=restore-drill-2026-07-15
+uv run python -m scripts.security_review
+```
+
+Recovery, deployment, legal, and release procedures are documented in `OPERATIONS.md`,
+`DEPLOYMENT.md`, `SECURITY.md`, `ATTRIBUTION.md`, `KNOWN_LIMITATIONS.md`, and
+`RELEASE_CHECKLIST.md`.
+
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 
 ```powershell
@@ -291,10 +328,18 @@ npm run lint:web
 npm run typecheck:web
 npm run build:web
 uv run python -m scripts.check_supabase
+uv run python -m scripts.security_review
+npx supabase db lint --local --schema knowledge
 ```
 
 On systems with GNU Make, `make install`, `make check`, and `make supabase-check` wrap the same commands.
 
 ## Security and attribution
 
-Use only development Supabase credentials locally. Raw corpus files, caches, keys, and generated builds are ignored. This is an unofficial project and is not affiliated with Klei Entertainment. Raw ingestion preserves the site-reported license, canonical URL, revision, and attribution; corpus processing carries source identity and revision provenance into every chunk for later citation construction.
+Use only development Supabase credentials locally. Raw corpus files, caches, keys, and generated
+builds are ignored. Chat requests are length limited and process-rate-limited; a multi-replica
+deployment still requires a shared gateway limiter. This is an unofficial project and is not
+affiliated with Klei Entertainment. Raw ingestion preserves the site-reported license, canonical
+URL, revision, and attribution; corpus processing carries source identity and revision provenance
+into every chunk for citation construction. See `SECURITY.md` and `ATTRIBUTION.md` for the complete
+release notes.

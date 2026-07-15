@@ -6,8 +6,10 @@ import httpx
 import pytest
 
 from src.operations import (
+    CorpusRestoreService,
     CorpusSnapshotService,
     SupabaseCorpusLifecycleRepository,
+    SupabaseRestoreRepository,
     SupabaseSnapshotRepository,
 )
 
@@ -88,6 +90,13 @@ def test_atomic_activation_snapshot_and_rollback() -> None:
     first_id = "90000000-0000-0000-0000-000000000001"
     second_id = "90000000-0000-0000-0000-000000000002"
     with httpx.Client(base_url=base_url, timeout=30.0) as client:
+        activate_fixture = client.patch(
+            "/rest/v1/wiki_pages",
+            headers=_headers(api_key, write=True),
+            params={"id": f"eq.{PAGE_ID}"},
+            json={"is_active": True},
+        )
+        activate_fixture.raise_for_status()
         _create_ready_corpus(
             client,
             api_key,
@@ -118,6 +127,51 @@ def test_atomic_activation_snapshot_and_rollback() -> None:
         assert snapshot.chunk_count == 1
         assert len(snapshot.sha256) == 64
 
+        with SupabaseRestoreRepository(
+            base_url=base_url,
+            api_key=api_key,
+            bucket="dst-corpus-snapshots",
+        ) as restore_repository:
+            restore = CorpusRestoreService(restore_repository).restore(
+                "milestone9-v1",
+                "milestone10-restored-v1",
+            )
+        assert restore.status == "validating"
+        assert restore.sha256 == snapshot.sha256
+
+        restored_chunks = client.get(
+            "/rest/v1/document_chunks",
+            headers=_headers(api_key),
+            params={
+                "corpus_version_id": f"eq.{restore.corpus_id}",
+                "select": "page_title,canonical_url,revision_id,content",
+            },
+        )
+        restored_chunks.raise_for_status()
+        assert restored_chunks.json() == [
+            {
+                "page_title": "Milestone Fixture",
+                "canonical_url": "https://example.invalid/wiki/Milestone_Fixture",
+                "revision_id": 1,
+                "content": "First complete corpus evidence",
+            }
+        ]
+        restored_search = client.post(
+            "/rest/v1/rpc/semantic_search_dst",
+            headers={
+                "apikey": api_key,
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "p_corpus_version": restore.corpus_id,
+                "p_query_embedding": [1.0] + [0.0] * 1023,
+                "p_match_count": 1,
+            },
+        )
+        restored_search.raise_for_status()
+        assert restored_search.json()[0]["page_title"] == "Milestone Fixture"
+
         with SupabaseCorpusLifecycleRepository(base_url=base_url, api_key=api_key) as lifecycle:
             rollback = lifecycle.rollback("milestone9-v1")
         assert rollback.active_version == "milestone9-v1"
@@ -141,9 +195,16 @@ def test_atomic_activation_snapshot_and_rollback() -> None:
         cleanup = client.delete(
             "/rest/v1/corpus_versions",
             headers=_headers(api_key, write=True),
-            params={"id": f"in.({first_id},{second_id})"},
+            params={"id": f"in.({first_id},{second_id},{restore.corpus_id})"},
         )
         cleanup.raise_for_status()
+        deactivate_fixture = client.patch(
+            "/rest/v1/wiki_pages",
+            headers=_headers(api_key, write=True),
+            params={"id": f"eq.{PAGE_ID}"},
+            json={"is_active": False},
+        )
+        deactivate_fixture.raise_for_status()
         storage_cleanup = client.request(
             "DELETE",
             "/storage/v1/object/dst-corpus-snapshots",

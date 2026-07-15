@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterator
+from functools import lru_cache
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -17,6 +18,7 @@ from src.embeddings import (
 )
 from src.generation import GroundedAnswerService, OllamaLLMAdapter
 from src.retrieval import ContextAssembler, RetrievalService
+from src.security import SlidingWindowRateLimiter
 from src.supabase_store import (
     SupabaseAliasRepository,
     SupabaseKnowledgeRepository,
@@ -136,3 +138,10 @@ def get_knowledge_repository(
         yield repository
     finally:
         repository.close()
+
+
+@lru_cache
+def get_chat_rate_limiter() -> SlidingWindowRateLimiter:
+    """Return the process-local public chat limiter."""
+    settings = get_settings()
+    return SlidingWindowRateLimiter(settings.chat_rate_limit_per_minute)

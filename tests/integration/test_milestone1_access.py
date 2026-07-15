@@ -127,3 +127,26 @@ def test_raw_storage_bucket_is_private() -> None:
             },
         )
         assert delete_response.status_code in {200, 204}
+
+
+def test_anon_cannot_execute_corpus_lifecycle_rpcs() -> None:
+    base_url, anon_key, _ = _required_environment()
+    headers = {
+        "apikey": anon_key,
+        "Authorization": f"Bearer {anon_key}",
+    }
+
+    with httpx.Client(base_url=base_url, timeout=5.0) as client:
+        activation = client.post(
+            "/rest/v1/rpc/activate_corpus_version",
+            headers=headers,
+            json={"p_version": "must-not-activate"},
+        )
+        rollback = client.post(
+            "/rest/v1/rpc/rollback_corpus_version",
+            headers=headers,
+            json={"p_version": "must-not-rollback"},
+        )
+
+    assert activation.status_code in {401, 403, 404}
+    assert rollback.status_code in {401, 403, 404}
