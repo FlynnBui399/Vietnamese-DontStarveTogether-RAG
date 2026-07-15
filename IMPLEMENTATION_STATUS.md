@@ -2,47 +2,38 @@
 
 ## Current Milestone
 
-Milestone 6 - Hybrid Retrieval: **Complete**
+Milestone 7 - Generation, Guardrails, and Citations: **Complete**
 
-Next: Milestone 7 - Generation, Guardrails, and Citations. Work is paused for user verification.
+Next: Milestone 8 - Web Interface.
 
-## Milestone 6 Completed
+## Milestone 7 Completed
 
-- Added a backend-only PostgreSQL hybrid RPC with a single-active-corpus CTE, exact `dst` scope
-  filtering, optional entity-type filtering, FTS and cosine candidate lists, and Reciprocal Rank
-  Fusion.
-- Added bounded resolved-entity and section-intent score boosts without combining incompatible raw
-  BM25 and cosine scales.
-- Added active-corpus/model-contract validation before query embedding and retrieval.
-- Added a transparent reranker using normalized RRF, title/content overlap, semantic similarity,
-  resolved entities, section intent, and a subjective-guide penalty.
-- Added an evidence threshold, exact body-hash duplicate removal, hard DST defense, and fixed final
-  result count.
-- Added diverse context assembly with preferred resolved pages, at most two chunks per page/section,
-  an 1800-token budget, and stable `CTX-*` identifiers.
-- Added a 20-case version-controlled entity/natural-query benchmark, local p95 measurement, CLI/Make
-  evaluation target, and opt-in live acceptance test.
-- Expanded the glossary with current-corpus canonical titles and reviewed typo/descriptive aliases
-  used by the entity benchmark.
+- Added a provider-independent LLM boundary and an Ollama `/api/chat` adapter with bounded
+  temperature, timeout, non-streaming output, and response validation.
+- Added a Vietnamese context-only system prompt that treats retrieved documents as untrusted data,
+  rejects instructions inside sources, and forbids internal-knowledge or internet supplementation.
+- Converted accepted context blocks into stable `S1`, `S2`, ... source objects carrying chunk,
+  canonical URL, section, revision, corpus, source-kind, and subjectivity metadata.
+- Added fail-closed citation validation for unknown IDs, non-active-corpus chunks, uncited factual
+  claims, and numeric values absent from their cited evidence.
+- Added deterministic abstention for no evidence, incomplete comparison evidence, and any invalid
+  generated citation output.
+- Added structured conflict detection for differing field values on the same page and subjectivity
+  warnings for guide evidence.
+- Added the typed `POST /api/chat` contract with resolved aliases, confidence, abstention reason,
+  corpus version, citations, conflicts, subjectivity, and measured pipeline latencies.
+- Added sanitized service-unavailable responses without exposing provider details, stack traces, or
+  credentials.
 
 ## Verification
 
 Executed on 2026-07-15:
 
 ```text
-Milestone 6 evaluation cases                                  20
-entity Recall@5                                             100% (target >= 90%)
-natural-query Recall@10                                     100% (target >= 85%)
-non-DST result count                                           0
-local Supabase retrieval p95                              13.633 ms (target <= 250 ms)
-sample typo: ancent archive                                  rank 1 / Ancient Archive
-active corpus/model enforcement                              passed
-context threshold/dedup/budget checks                        passed
-live tests/integration/test_milestone6_retrieval.py -q       passed (1 test)
-uv run ruff format --check .                                 passed
+uv run ruff format --check .                                 passed (83 files)
 uv run ruff check .                                          passed
-uv run mypy                                                  passed (69 source files)
-uv run pytest -q                                             passed (32, 8 integration skipped)
+uv run mypy                                                  passed (83 source files)
+uv run pytest -q                                             passed (38, 8 integration skipped)
 npm run lint:web                                             passed
 npm run typecheck:web                                        passed
 npm run build:web                                            passed
@@ -50,24 +41,30 @@ npx supabase db lint --local --schema knowledge              passed
 npx supabase migration list --local                          passed (5 migrations)
 ```
 
+Focused generation acceptance covers valid active-corpus citations, fake citation rejection,
+uncited-output abstention, no-evidence abstention, incomplete-comparison abstention, structured
+conflict detection, Ollama request shape, and the public structured chat response.
+
 ## Unverified Criteria
 
-- The 20-case benchmark is a milestone acceptance set over the current 30-page local corpus, not the
-  final 150+ question release benchmark required by Milestone 10.
-- Retrieval quality was validated with deterministic test vectors. Ollama `bge-m3` quality, a neural
-  cross-encoder reranker, and hosted-Supabase latency remain unverified.
-- The configured hosted project was not migrated or mutated; all database acceptance used explicit
-  local credentials.
+- Live answer quality and latency with Ollama remain unverified because no corpus is left active and
+  Milestone 9 owns validated production activation. Unit acceptance uses deterministic evidence and
+  mocked LLM output; it does not claim model quality.
+- Evidence-to-claim validation is deterministic and conservative: it proves citation membership,
+  active-corpus provenance, per-claim citation presence, and numerical support. General semantic
+  entailment remains an evaluation concern for Milestone 10.
+- Streaming is not enabled because the citation validator must inspect the complete answer before any
+  factual text is exposed. The UI may add streaming only if it preserves that fail-closed boundary.
 
 ## Known Issues and Deferred Work
 
-- No corpus is left active after acceptance because production activation, rollback, and snapshots
-  belong to Milestone 9. Retrieval intentionally fails closed until an active corpus exists.
-- The heuristic reranker is auditable and benchmarked on the milestone set but is not equivalent to
-  a multilingual neural cross-encoder.
-- Generation, factual guardrails, and final citation validation begin in Milestone 7; `CTX-*` values
-  are retrieval context identifiers, not yet user-facing citations.
-- The user's `prompt.md` modification and `milestone0.md` deletion remain untouched.
+- The web application still shows the foundation status page; the chat, citation cards, and source
+  drawer begin in Milestone 8.
+- No corpus is left active after acceptance. Atomic activation, rollback, and snapshots begin in
+  Milestone 9.
+- The configured hosted project was not migrated or mutated; database verification used the local
+  Supabase development stack.
+- The PowerShell profile parse warning is environmental and did not change any command exit status.
 
 ## Completed Milestones
 
@@ -77,4 +74,5 @@ npx supabase migration list --local                          passed (5 migration
 - Milestone 3 - Processing, Classification, and Chunking (`5ed2f75`)
 - Milestone 4 - Vietnamese Terminology and Alias Layer (`1b42ff1`)
 - Milestone 5 - Embeddings and Search Indexes (`ece8130`)
-- Milestone 6 - Hybrid Retrieval
+- Milestone 6 - Hybrid Retrieval (`c6a0501`)
+- Milestone 7 - Generation, Guardrails, and Citations

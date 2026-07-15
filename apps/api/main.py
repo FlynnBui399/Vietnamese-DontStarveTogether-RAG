@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from apps.api.routes.chat import router as chat_router
 from apps.api.routes.health import router as health_router
 from src.config import get_settings
 
@@ -17,7 +18,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[str(settings.frontend_origin).rstrip("/")],
     allow_credentials=False,
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )
 app.include_router(health_router, prefix="/api")
+app.include_router(chat_router, prefix="/api")

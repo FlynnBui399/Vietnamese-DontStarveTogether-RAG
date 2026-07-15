@@ -2,7 +2,10 @@
 
 An unofficial, source-grounded Vietnamese assistant for **Don't Starve Together**. The planned system uses FastAPI, Next.js, and Supabase PostgreSQL. Supabase is the production knowledge source; the browser communicates only with FastAPI.
 
-Milestones 0 through 3 provide the verified application foundation, private Supabase knowledge platform, bounded revision-aware wiki ingestion, and a validated section-aware corpus processor. Embeddings, retrieval, and generation are implemented in subsequent milestones. See `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
+Milestones 0 through 7 provide the verified application foundation, private Supabase knowledge
+platform, revision-aware ingestion and processing, Vietnamese terminology, embeddings, hybrid
+retrieval, and fail-closed grounded generation with validated citations. See `planning.md` for the
+authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
 
 ## Prerequisites
 
@@ -154,6 +157,33 @@ uv run python -m scripts.evaluate_retrieval
 `make evaluate-retrieval` wraps the same command. Retrieval fails closed when no corpus is active or
 when its embedding model differs from the query adapter. Milestone 6 acceptance temporarily activates
 and restores a local test corpus; production activation and rollback remain Milestone 9 work.
+
+## Grounded generation and citations
+
+`POST /api/chat` runs the complete backend-only pipeline: stored alias resolution, query embedding,
+active-corpus hybrid retrieval, reranking, bounded context assembly, Ollama generation, and citation
+validation. The model receives only accepted chunks with stable `S1`, `S2`, ... identifiers. A
+factual response is returned only when every citation exists in that evidence set, belongs to the
+active corpus, and any numeric claim appears in its cited source. Invalid or missing citations are
+replaced with a deterministic abstention instead of exposing ungrounded model output.
+
+Explicit comparisons require evidence for every resolved entity. Structured source conflicts are
+reported in the response, and guide evidence sets `subjective_warning`. Retrieved source text is
+treated as untrusted data: instructions inside a wiki chunk are delimited and explicitly ignored by
+the grounded system prompt.
+
+With a validated active corpus, synchronized aliases, matching embedding configuration, and the
+configured Ollama models running, call the API from PowerShell:
+
+```powershell
+$body = @{ message = "Mũ da heo bảo vệ như thế nào?" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/chat `
+  -ContentType application/json -Body $body
+```
+
+The response includes `answer`, validated `citations`, `resolved_entities`, confidence, abstention
+state/reason, corpus version, subjective/conflict flags, and measured stage latencies. The endpoint
+returns a sanitized `503` when Supabase, embeddings, or Ollama are unavailable.
 
 To rerun the live access-control checks in PowerShell without writing local credentials to a file:
 

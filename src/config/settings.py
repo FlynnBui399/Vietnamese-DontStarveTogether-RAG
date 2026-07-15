@@ -51,6 +51,15 @@ class Settings(BaseSettings):
     embedding_batch_size: int = Field(default=16, gt=0, le=128)
     embedding_timeout_seconds: float = Field(default=120.0, gt=0)
 
+    llm_provider: Literal["ollama"] = "ollama"
+    ollama_base_url: AnyHttpUrl = AnyHttpUrl("http://127.0.0.1:11434")
+    llm_model: str = "qwen2.5:7b-instruct"
+    llm_temperature: float = Field(default=0.1, ge=0.0, le=1.0)
+    llm_timeout_seconds: float = Field(default=120.0, gt=0)
+    retrieval_match_count: int = Field(default=8, ge=1, le=20)
+    min_evidence_score: float = Field(default=0.20, ge=0.0, le=1.0)
+    max_context_tokens: int = Field(default=1800, ge=200, le=8000)
+
     @model_validator(mode="after")
     def validate_supabase_pair(self) -> Self:
         """Require a URL and key together while allowing an unconfigured local app."""
