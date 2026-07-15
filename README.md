@@ -2,7 +2,7 @@
 
 An unofficial, source-grounded Vietnamese assistant for **Don't Starve Together**. The planned system uses FastAPI, Next.js, and Supabase PostgreSQL. Supabase is the production knowledge source; the browser communicates only with FastAPI.
 
-Milestone 0 provides the repository foundation and health-check UI. Database schema, ingestion, retrieval, and generation are intentionally deferred. See `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
+Milestone 0 provides the verified repository foundation and health-check UI. Its baseline migration applies to a clean local Supabase database. Database schema, ingestion, retrieval, and generation are implemented in subsequent milestones. See `planning.md` for the authoritative architecture and `IMPLEMENTATION_STATUS.md` for verified progress.
 
 ## Prerequisites
 

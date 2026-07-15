@@ -2,49 +2,48 @@
 
 ## Current Milestone
 
-Milestone 0 — Repository and Supabase Foundation: **Implemented; local migration verification pending**
+Milestone 0 - Repository and Supabase Foundation: **Complete**
 
-Milestone 1 has not started.
+Next: Milestone 1 - Database, Extensions, and Storage.
 
-## Implemented
+## Milestone 0 Completed
 
-- Initialized Git on branch `milestone-0-foundation`.
-- Added reproducible Python (`pyproject.toml`, `uv.lock`) and npm workspace (`package-lock.json`) environments.
-- Added a FastAPI application with `GET /api/health`, CORS restricted to the configured frontend origin, and safe Supabase connectivity reporting.
-- Added a strict-TypeScript Next.js status page that calls the backend health endpoint.
-- Added Supabase CLI 2.109.1, generated `supabase/config.toml`, and created an intentionally schema-free baseline migration and seed file.
-- Added Ruff, mypy, pytest, ESLint, TypeScript, production build, GitHub Actions, and Gitleaks configuration.
-- Added `.env.example`, `.gitignore`, Makefile wrappers, repository directories, and local-development documentation.
+- Initialized the Python, FastAPI, Next.js, npm workspace, and Supabase project structure.
+- Added typed environment configuration, CORS, and `GET /api/health`.
+- Added Ruff, mypy, pytest, ESLint, TypeScript, Next.js build, CI, and Gitleaks checks.
+- Added repository-local install, run, check, and Supabase command wrappers.
+- Isolated settings and API tests from the developer's local `.env` so results are reproducible.
+- Applied the baseline migration and seed to a clean local Supabase database.
 
-## Acceptance Status
+## Files Modified During Verification
 
-- **Passed:** Backend and frontend start; both returned HTTP 200.
-- **Passed:** `/api/health` returns structured JSON and the configured CORS origin.
-- **Passed:** Hosted development Supabase API connectivity using a temporary publishable key; the key was not persisted.
-- **Passed:** Backend formatting, linting, strict type checking, and 4 unit tests.
-- **Passed:** Frontend linting, strict type checking, and production build.
-- **Passed:** Environment files and generated state are ignored; a local credential-pattern scan found no secrets.
-- **Not verified:** Clean local migration application. Docker is functional, but the first Supabase Postgres image download did not finish within the bounded attempts.
-- **Not verified:** Visual browser rendering. The in-app browser was unavailable; HTTP, CORS, component logic, type checking, and production build were verified.
+- `tests/unit/test_health.py`
+- `tests/unit/test_settings.py`
+- `README.md`
+- `IMPLEMENTATION_STATUS.md`
 
-## Verification Commands
+## Verification
+
+Executed on 2026-07-15:
 
 ```text
-uv run ruff format --check .
-uv run ruff check .
-uv run mypy
-uv run pytest -q
-npm run lint:web
-npm run typecheck:web
-npm run build:web
-npm ci --dry-run --no-audit --no-fund
-uv run uvicorn apps.api.main:app --host 127.0.0.1 --port 8000
-npm run dev --workspace @dst-rag/web
-uv run python -m scripts.check_supabase
-rg (credential-pattern scan with generated directories excluded)
+uv run ruff format --check .                         passed (12 files)
+uv run ruff check .                                  passed
+uv run mypy                                          passed
+uv run pytest -q                                     passed (4 tests)
+npm run lint:web                                     passed
+npm run typecheck:web                                passed
+npm run build:web                                    passed
+docker version --format '{{.Server.Version}}'        passed (27.4.0)
+npx supabase status                                  passed
+npx supabase db reset                                passed
 ```
 
-## Deferred
+## Unverified Criteria
 
-Database tables, extensions, Storage buckets, RLS, ingestion, retrieval, generation, and corpus behavior remain deferred to their assigned milestones. The local migration check can be completed after Docker finishes downloading the Supabase images with `npm run supabase:start` followed by `npx supabase db reset`.
+- Visual browser rendering was not rechecked during this milestone verification. Component logic, HTTP behavior, linting, type checking, and the production build were verified.
+
+## Known Issues
+
+- The user's PowerShell profile contains an unrelated parse error and prints noise before command output. Repository commands still execute successfully.
 

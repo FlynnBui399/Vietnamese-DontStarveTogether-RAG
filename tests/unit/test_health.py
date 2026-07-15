@@ -9,18 +9,24 @@ import pytest
 
 from apps.api.main import app
 from apps.api.routes.health import check_supabase
-from src.config import Settings
+from src.config import Settings, get_settings
 
 
 def test_health_reports_unconfigured_supabase_honestly() -> None:
     """The API remains inspectable without pretending Supabase is connected."""
+
+    settings = Settings(_env_file=None)
+    app.dependency_overrides[get_settings] = lambda: settings
 
     async def request_health() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
             return await client.get("/api/health")
 
-    response = asyncio.run(request_health())
+    try:
+        response = asyncio.run(request_health())
+    finally:
+        app.dependency_overrides.clear()
 
     assert response.status_code == 200
     assert response.json() == {
@@ -62,6 +68,7 @@ def test_publishable_key_uses_non_privileged_health_endpoint(
 
     monkeypatch.setattr(httpx, "AsyncClient", FakeAsyncClient)
     settings = Settings(
+        _env_file=None,
         supabase_url="https://example.supabase.co",
         supabase_publishable_key="publishable-placeholder",
     )
