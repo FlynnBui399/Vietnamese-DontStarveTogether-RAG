@@ -1,0 +1,23 @@
+{
+  "name": "dst-vietnamese-rag",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others --names api,web \"uv run uvicorn apps.api.main:app --reload --host 127.0.0.1 --port 8000\" \"npm run dev --workspace @dst-rag/web\"",
+    "lint:web": "npm run lint --workspace @dst-rag/web",
+    "typecheck:web": "npm run typecheck --workspace @dst-rag/web",
+    "build:web": "npm run build --workspace @dst-rag/web",
+    "supabase:init": "supabase init",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "supabase": "^2.109.1"
+  }
+}
+
