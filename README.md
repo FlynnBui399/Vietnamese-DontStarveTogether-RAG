@@ -76,3 +76,5 @@ Response `/api/chat` chỉ có hai trường:
 - Có: làm sạch Wiki, chunking, embedding, vector top-k, DeepSeek và citation.
 - Chưa dùng: alias expansion, full-text search, RRF, reranker, corpus lifecycle,
   snapshot/rollback và release evaluation.
+## Đóng góp (Contribute)
+Nếu bạn có đóng góp gì thì hãy fork rồi tạo pr cho mình nhé!
