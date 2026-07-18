@@ -1,0 +1,15 @@
+{
+  "name": "dst-rag-field-guide-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:syntax": "node --check src/data.js && node --check src/components.js && node --check src/app.js",
+    "lint": "eslint src",
+    "typecheck": "tsc -p jsconfig.json"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "typescript": "^6.0.3"
+  }
+}

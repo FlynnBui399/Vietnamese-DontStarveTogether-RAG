@@ -1,0 +1,124 @@
+# -----------------------------------------------------------------------------
+# Secrets and local environment configuration
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# -----------------------------------------------------------------------------
+# Python, uv, packaging, and test/tool caches
+# Keep pyproject.toml and uv.lock under version control.
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+.venv/
+venv/
+env/
+ENV/
+
+*.egg-info/
+.eggs/
+*.egg
+build/
+dist/
+pip-wheel-metadata/
+
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# -----------------------------------------------------------------------------
+# Node.js frontend dependencies, build output, and tool caches
+# Keep apps/web/package-lock.json under version control.
+# -----------------------------------------------------------------------------
+node_modules/
+.npm/
+.eslintcache
+.parcel-cache/
+.vite/
+.next/
+.nuxt/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------------------------------------------------------
+# Supabase CLI local state
+# Keep supabase/config.toml and migrations under version control.
+# -----------------------------------------------------------------------------
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+supabase/.env.*
+
+# -----------------------------------------------------------------------------
+# CodeGraph machine-local index and daemon state
+# Keep .codegraph/.gitignore if the repository should remain CodeGraph-enabled.
+# -----------------------------------------------------------------------------
+.codegraph/*.db
+.codegraph/*.db-*
+.codegraph/*.log
+.codegraph/*.pid
+.codegraph/*.sock
+
+# -----------------------------------------------------------------------------
+# Runtime caches, generated reports, datasets, and model artifacts
+# Commit only small, intentional fixtures under tests/fixtures/.
+# -----------------------------------------------------------------------------
+data/cache/
+data/raw/
+logs/
+outputs/
+reports/
+
+*.sqlite
+*.sqlite3
+*.parquet
+*.pkl
+*.pickle
+*.joblib
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+# -----------------------------------------------------------------------------
+# Jupyter, IDE, OS, editor, and temporary files
+# -----------------------------------------------------------------------------
+.ipynb_checkpoints/
+.idea/
+.vscode/
+.vs/
+*.code-workspace
+*.suo
+*.user
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+~$*
+
+# Local AI-agent working directories are empty/generated in this checkout.
+/.agents/
+/.codex/

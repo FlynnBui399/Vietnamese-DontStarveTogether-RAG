@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 320" role="img" aria-labelledby="title desc">
+  <title id="title">Crooked woodland masthead</title>
+  <desc id="desc">An original dark ink landscape of crooked trees, distant hills, a pale moon, and field-journal scratches.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#221b17"/>
+      <stop offset="0.62" stop-color="#17130f"/>
+      <stop offset="1" stop-color="#0b0907"/>
+    </linearGradient>
+    <radialGradient id="moonGlow">
+      <stop offset="0" stop-color="#c8ad82" stop-opacity=".32"/>
+      <stop offset=".4" stop-color="#aa8963" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#aa8963" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".018 .12" numOctaves="2" seed="13" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3"/>
+    </filter>
+    <pattern id="hatch" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(17)">
+      <path d="M0 2h22" stroke="#c8ad82" stroke-opacity=".045" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="320" fill="url(#sky)"/>
+  <circle cx="1280" cy="76" r="150" fill="url(#moonGlow)"/>
+  <circle cx="1280" cy="76" r="38" fill="#c8ad82" opacity=".18"/>
+  <circle cx="1294" cy="66" r="35" fill="#211a16" opacity=".6"/>
+  <path d="M0 223C130 177 219 188 328 208c126 23 230-34 356-17 115 16 200 1 321-26 181-41 350 3 595 37v118H0Z" fill="#17120f"/>
+  <path d="M0 256c170-22 297-2 443-9 163-8 281-51 437-31 182 24 342-16 720 19v85H0Z" fill="#0c0a08"/>
+  <g fill="#0a0807" stroke="#0a0807" stroke-linejoin="round" filter="url(#rough)">
+    <path d="M103 287c11-79 2-128-15-192l16-5 11 75 25-40 10 8-30 61 3 93Z"/>
+    <path d="M112 143 68 105l8-10 37 24 8-63 13 2-3 66 42-35 10 12-51 52Z"/>
+    <path d="M1460 293c-4-88 10-145 35-212l17 6-18 79 38-34 11 13-49 54-10 94Z"/>
+    <path d="m1491 126-31-51 13-8 25 30 16-59 13 4-10 62 46-29 8 15-58 42Z"/>
+    <path d="M410 293c1-54-8-98-29-133l13-8 18 38 14-81 15 4-10 72 31-41 12 11-43 67 2 71Z"/>
+    <path d="M899 294c8-69 2-117-15-159l14-6 15 43 23-69 14 6-18 70 34-31 10 12-48 55-5 79Z"/>
+  </g>
+  <g fill="none" stroke="#aa8963" stroke-opacity=".12" stroke-linecap="round">
+    <path d="M715 61c28-26 72-28 105-8 25 16 36 47 24 73-17 37-71 48-108 22-34-24-43-61-21-87Z"/>
+    <path d="M708 75c42 13 84 13 128 0M725 48c24 43 35 74 40 108m45-108c-25 38-34 70-37 108"/>
+    <path d="M203 53c86 9 155 2 219-21M1137 152c105-19 196-20 305-5"/>
+  </g>
+  <rect width="1600" height="320" fill="url(#hatch)"/>
+  <g fill="#c8ad82" opacity=".18">
+    <circle cx="1190" cy="42" r="2"/><circle cx="1132" cy="91" r="1.6"/><circle cx="1387" cy="54" r="1.8"/>
+    <circle cx="1058" cy="38" r="1.2"/><circle cx="1450" cy="112" r="1.3"/><circle cx="975" cy="75" r="1.4"/>
+  </g>
+</svg>

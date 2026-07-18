@@ -1,0 +1,106 @@
+"""Environment-backed settings with validation for paired Supabase values."""
+
+from functools import lru_cache
+from pathlib import Path
+from typing import Literal, Self
+
+from pydantic import AnyHttpUrl, Field, SecretStr, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """Runtime settings loaded from environment variables or a local `.env` file."""
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_ignore_empty=True,
+        extra="ignore",
+        case_sensitive=False,
+    )
+
+    app_env: Literal["development", "test", "production"] = "development"
+    app_host: str = "127.0.0.1"
+    app_port: int = 8000
+    frontend_origin: AnyHttpUrl = AnyHttpUrl("http://127.0.0.1:3000")
+
+    supabase_url: AnyHttpUrl | None = None
+    supabase_publishable_key: SecretStr | None = None
+    supabase_secret_key: SecretStr | None = None
+    supabase_service_role_key: SecretStr | None = None
+    supabase_raw_bucket: str = "dst-wiki-raw"
+    supabase_snapshot_bucket: str = "dst-corpus-snapshots"
+    supabase_eval_bucket: str = "dst-evaluation-reports"
+
+    wiki_base_url: AnyHttpUrl = AnyHttpUrl("https://dontstarve.wiki.gg")
+    wiki_api_url: AnyHttpUrl = AnyHttpUrl("https://dontstarve.wiki.gg/api.php")
+    wiki_user_agent: str = (
+        "DSTVietnameseAssistant/0.2 "
+        "(https://github.com/FlynnBui399/Vietnamese-DontStarveTogether-RAG)"
+    )
+    wiki_request_delay_ms: int = 500
+    wiki_max_concurrency: int = Field(default=1, ge=1, le=1)
+    wiki_request_timeout_seconds: float = 20.0
+    wiki_max_retries: int = 3
+    wiki_cache_dir: Path = Path("data/cache/mediawiki")
+    wiki_cache_ttl_seconds: int = 3600
+    auto_ingest_enabled: bool = True
+    auto_ingest_max_pages: int = Field(default=3, ge=1, le=5)
+
+    embedding_dimensions: int = Field(default=1024, gt=0)
+    embedding_provider: Literal["ollama", "deterministic"] = "ollama"
+    embedding_base_url: AnyHttpUrl = AnyHttpUrl("http://127.0.0.1:11434")
+    embedding_model: str = "bge-m3"
+    embedding_model_revision: str = "unversioned"
+    embedding_batch_size: int = Field(default=16, gt=0, le=128)
+    embedding_timeout_seconds: float = Field(default=120.0, gt=0)
+
+    llm_provider: Literal["deepseek", "groq", "ollama"] = "deepseek"
+    deepseek_base_url: AnyHttpUrl = AnyHttpUrl("https://api.deepseek.com")
+    deepseek_api_key: SecretStr | None = None
+    groq_base_url: AnyHttpUrl = AnyHttpUrl("https://api.groq.com/openai/v1")
+    groq_api_key: SecretStr | None = None
+    ollama_base_url: AnyHttpUrl = AnyHttpUrl("http://127.0.0.1:11434")
+    llm_model: str = "deepseek-v4-flash"
+    llm_temperature: float = Field(default=0.1, ge=0.0, le=1.0)
+    llm_max_output_tokens: int = Field(default=1024, ge=1, le=8192)
+    llm_timeout_seconds: float = Field(default=120.0, gt=0)
+    retrieval_match_count: int = Field(default=8, ge=1, le=20)
+    min_evidence_score: float = Field(default=0.20, ge=0.0, le=1.0)
+    max_context_tokens: int = Field(default=1800, ge=200, le=8000)
+    chat_rate_limit_per_minute: int = Field(default=30, ge=1, le=1000)
+
+    @model_validator(mode="after")
+    def validate_supabase_pair(self) -> Self:
+        """Require a URL and key together while allowing an unconfigured local app."""
+        has_key = self.supabase_api_key is not None
+        if (self.supabase_url is None) != (not has_key):
+            raise ValueError(
+                "SUPABASE_URL and a Supabase API key must be configured together"
+            )
+        return self
+
+    @property
+    def supabase_api_key(self) -> SecretStr | None:
+        """Prefer modern server credentials while retaining local/legacy compatibility."""
+        return (
+            self.supabase_secret_key
+            or self.supabase_service_role_key
+            or self.supabase_publishable_key
+        )
+
+    @property
+    def supabase_configured(self) -> bool:
+        """Return whether the minimum values for a connectivity probe are available."""
+        return self.supabase_url is not None and self.supabase_api_key is not None
+
+    @property
+    def supabase_admin_api_key(self) -> SecretStr | None:
+        """Return only a server-side key suitable for ingestion writes."""
+        return self.supabase_secret_key or self.supabase_service_role_key
+
+
+@lru_cache
+def get_settings() -> Settings:
+    """Build settings once per process."""
+    return Settings()

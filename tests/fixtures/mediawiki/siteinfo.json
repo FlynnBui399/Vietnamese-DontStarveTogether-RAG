@@ -1,0 +1,21 @@
+{
+  "batchcomplete": true,
+  "query": {
+    "general": {
+      "sitename": "Don't Starve Wiki",
+      "generator": "MediaWiki 1.43.6",
+      "lang": "en",
+      "articlepath": "/wiki/$1",
+      "server": "https://dontstarve.wiki.gg"
+    },
+    "namespaces": {
+      "0": {"id": 0, "name": "", "content": true},
+      "1": {"id": 1, "name": "Talk", "content": false},
+      "14": {"id": 14, "name": "Category", "content": false}
+    },
+    "rightsinfo": {
+      "url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "text": "Creative Commons Attribution-ShareAlike 4.0 License"
+    }
+  }
+}

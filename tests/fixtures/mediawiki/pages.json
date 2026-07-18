@@ -1,0 +1,30 @@
+{
+  "batchcomplete": true,
+  "query": {
+    "pages": [
+      {
+        "pageid": 200315,
+        "ns": 0,
+        "title": "Football Helmet",
+        "contentmodel": "wikitext",
+        "pagelanguage": "en",
+        "fullurl": "https://dontstarve.wiki.gg/wiki/Football_Helmet",
+        "revisions": [
+          {
+            "revid": 377548,
+            "parentid": 377547,
+            "timestamp": "2026-07-01T12:00:00Z",
+            "sha1": "0123456789abcdef0123456789abcdef01234567",
+            "slots": {
+              "main": {
+                "contentmodel": "wikitext",
+                "contentformat": "text/x-wiki",
+                "content": "{{Item Infobox}}\n'''Football Helmet''' is an armor item."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
